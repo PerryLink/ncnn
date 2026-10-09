@@ -52,14 +52,9 @@ static void binary_op_broadcast(const Mat& a, const Mat& b, Mat& c, const Option
         const float* ptr1 = b;
         float* outptr = c;
 
-        const int ainc = a.w > 1 ? 1 : 0;
-        const int binc = b.w > 1 ? 1 : 0;
-
         for (int x = 0; x < w; x++)
         {
-            outptr[x] = op(*ptr, *ptr1);
-            ptr += ainc;
-            ptr1 += binc;
+            outptr[x] = op(ptr[std::min(x, a.w - 1)], ptr1[std::min(x, b.w - 1)]);
         }
     }
 
@@ -72,14 +67,9 @@ static void binary_op_broadcast(const Mat& a, const Mat& b, Mat& c, const Option
             const float* ptr1 = b.row(std::min(y, b.h - 1));
             float* outptr = c.row(y);
 
-            const int ainc = a.w > 1 ? 1 : 0;
-            const int binc = b.w > 1 ? 1 : 0;
-
             for (int x = 0; x < w; x++)
             {
-                outptr[x] = op(*ptr, *ptr1);
-                ptr += ainc;
-                ptr1 += binc;
+                outptr[x] = op(ptr[std::min(x, a.w - 1)], ptr1[std::min(x, b.w - 1)]);
             }
         }
     }
@@ -91,9 +81,6 @@ static void binary_op_broadcast(const Mat& a, const Mat& b, Mat& c, const Option
         {
             float* outptr = c.channel(q);
 
-            const int ainc = a.w > 1 ? 1 : 0;
-            const int binc = b.w > 1 ? 1 : 0;
-
             for (int z = 0; z < d; z++)
             {
                 for (int y = 0; y < h; y++)
@@ -103,9 +90,7 @@ static void binary_op_broadcast(const Mat& a, const Mat& b, Mat& c, const Option
 
                     for (int x = 0; x < w; x++)
                     {
-                        outptr[x] = op(*ptr, *ptr1);
-                        ptr += ainc;
-                        ptr1 += binc;
+                        outptr[x] = op(ptr[std::min(x, a.w - 1)], ptr1[std::min(x, b.w - 1)]);
                     }
 
                     outptr += w;
